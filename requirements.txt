@@ -1,0 +1,3 @@
+# Needed only for make_tiles.py (the website itself needs nothing installed).
+# "[binary]" bundles the libvips library, so there is nothing else to set up.
+pyvips[binary]>=3.0

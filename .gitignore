@@ -1,0 +1,11 @@
+# The master image is far over GitHub's 100 MB per-file limit and the website
+# does not need it - only the tiles made from it. Keep it on your computer.
+/grid.png
+/grid_labeled.png
+
+# Half-finished tile build (make_tiles.py removes it when it succeeds)
+/tiles.new/
+
+# Local tooling
+__pycache__/
+.claude/
