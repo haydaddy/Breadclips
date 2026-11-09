@@ -1,47 +1,63 @@
 # Bread clip viewer
 
-A web page that shows the whole bread clip grid as one long, smooth scroll, and
-lets visitors zoom in to the full detail of the scans. It is built to be hosted
-for free on GitHub Pages and embedded in the Wikidot site with an `[[iframe]]`.
+Web pages that show the bread clip grids as smooth, scrollable images that
+visitors can zoom into right down to the detail of the scans. They are hosted
+for free on GitHub Pages and embedded in the Wikidot site with `[[iframe]]`.
+
+There is one page per image, each with its own address:
+
+| Image | Address |
+| --- | --- |
+| `grid.png` | <https://haydaddy.github.io/Breadclips/> |
+| `grid2.png` | <https://haydaddy.github.io/Breadclips/grid2/> |
 
 **Contents**
 
 1. [How it works](#1-how-it-works)
 2. [What is in this folder](#2-what-is-in-this-folder)
 3. [Try it on your computer](#3-try-it-on-your-computer)
-4. [Put it on GitHub Pages](#4-put-it-on-github-pages)
+4. [Publish to GitHub Pages](#4-publish-to-github-pages)
 5. [Embed it in Wikidot](#5-embed-it-in-wikidot)
-6. [Updating the image](#6-updating-the-image)
-7. [Controls](#7-controls)
-8. [Settings you can change](#8-settings-you-can-change)
-9. [Limits worth knowing](#9-limits-worth-knowing)
-10. [Troubleshooting](#10-troubleshooting)
+6. [Updating an image](#6-updating-an-image)
+7. [Adding another image](#7-adding-another-image)
+8. [Controls](#8-controls)
+9. [Settings you can change](#9-settings-you-can-change)
+10. [Limits worth knowing](#10-limits-worth-knowing)
+11. [Troubleshooting](#11-troubleshooting)
 
 ---
 
 ## 1. How it works
 
-The master image, `grid.png`, is 3,612 × 82,080 pixels (296 megapixels, 225 MB).
-No browser can comfortably load that as one picture, and most phones cannot
-open it at all.
+The master images are far too big to put on a web page as they are:
 
-So the image is cut into **tiles** - small 512-pixel squares - the same way
-online maps work:
+| Image | Size | File |
+| --- | --- | --- |
+| `grid.png` | 3,612 × 82,080 pixels (296 megapixels) | 225 MB |
+| `grid2.png` | 9,060 × 11,733 pixels (106 megapixels) | 43 MB |
 
-- The full-size image is cut into 1,288 tiles.
-- Then the image is shrunk to half size and cut again (324 tiles), then to a
-  quarter (82 tiles), and so on down to a single pixel. These are the
-  **levels** of the pyramid: 18 of them, 1,747 tiles and about 86 MB in total.
+No browser can comfortably load pictures that size, and most phones cannot
+open them at all. So each image is cut into **tiles** - small 512-pixel
+squares - the same way online maps work:
+
+- The full-size image is cut into tiles.
+- Then the image is shrunk to half size and cut again, then to a quarter, and
+  so on down to a single pixel. These are the **levels** of the pyramid.
 - The viewer only downloads the handful of tiles that are on screen, at the
-  level that matches the current zoom. Fitted to width on a normal monitor
-  that is roughly 15 small files, not 225 MB.
+  level that matches the current zoom - for `grid.png` fitted to width on a
+  normal monitor that is roughly 15 small files, not 225 MB.
+
+| Image | Levels | Tiles | Size of all tiles |
+| --- | --- | --- | --- |
+| `grid.png` | 18 | 1,747 | 86 MB |
+| `grid2.png` | 15 | 575 | 15 MB |
 
 This format is called **Deep Zoom** (DZI). Two tools do the work:
 
 | Tool | Job |
 | --- | --- |
-| **pyvips** (Python) | cuts `grid.png` into tiles - `make_tiles.py` |
-| **OpenSeadragon** (JavaScript) | shows the tiles in the browser - `index.html` |
+| **pyvips** (Python) | cuts the master images into tiles - `make_tiles.py` |
+| **OpenSeadragon** (JavaScript) | shows the tiles in the browser - `viewer/viewer.js` |
 
 Nothing runs on a server. The site is only files, which is why free static
 hosting like GitHub Pages is enough.
@@ -50,119 +66,125 @@ hosting like GitHub Pages is enough.
 
 ## 2. What is in this folder
 
-| File / folder | What it is | Upload to GitHub? |
+| File / folder | What it is | On GitHub? |
 | --- | --- | --- |
-| `index.html` | the viewer page (all of its code is inside this one file) | yes |
-| `tiles/` | the tile pyramid - **generated**, never edit by hand | yes |
-| `tiles/breadclips.dzi` | standard Deep Zoom description of the image | yes |
-| `tiles/breadclips_files/` | the tiles, one folder per level (`17` = full size) | yes |
-| `tiles/manifest.js` | image size + version stamp read by `index.html` | yes |
+| `index.html` | the page for `grid.png` (the front page of the site) | yes |
+| `tiles/` | the tiles of `grid.png` - **generated**, never edit by hand | yes |
+| `grid2/index.html` | the page for `grid2.png` | yes |
+| `grid2/tiles/` | the tiles of `grid2.png` - **generated** | yes |
+| `viewer/viewer.js` | the viewer itself, shared by every page | yes |
+| `viewer/viewer.css` | how the viewer looks, shared by every page | yes |
 | `vendor/openseadragon/` | OpenSeadragon 6.1.1, included so the site depends on no other website | yes |
-| `make_tiles.py` | rebuilds `tiles/` from the master image | yes |
+| `make_tiles.py` | rebuilds the tiles from the master images, and makes pages for new ones | yes |
 | `make_tiles.bat` | the same, as a double-click | yes |
 | `preview.bat` | shows the site on your own computer | yes |
 | `requirements.txt` | what `make_tiles.py` needs installed | yes |
 | `.nojekyll` | tells GitHub Pages to publish the files exactly as they are | yes |
 | `.gitignore` | tells Git which files to leave out | yes |
-| `grid.png` | the master image | **no** - see below |
+| `grid.png`, `grid2.png` | the master images | **no** - see below |
 
-`grid.png` stays on your computer. GitHub refuses any file over 100 MB, and the
-website does not use it - only the tiles made from it. `.gitignore` already
-keeps it out, so you do not have to do anything.
+Inside each `tiles/` folder:
+
+| File | What it is |
+| --- | --- |
+| `breadclips.dzi` | standard Deep Zoom description of the image |
+| `breadclips_files/` | the tiles, one folder per level (the highest number = full size) |
+| `manifest.js` | image size, version stamp and which master it came from |
+
+The master images stay on your computer. GitHub refuses any file over 100 MB
+(`grid.png` is 225 MB), and the website does not use them - only the tiles made
+from them. `.gitignore` keeps every `grid….png` in this folder out
+automatically.
+
+Each page (`index.html`, `grid2/index.html`) is only a few lines long: it names
+its title and loads the shared viewer, which reads the tiles in the `tiles/`
+folder next to the page. A change to `viewer/viewer.js` or `viewer.css`
+therefore changes every page at once.
 
 ---
 
 ## 3. Try it on your computer
 
 Double-click **`preview.bat`**. A browser tab opens at `http://127.0.0.1:8000/`
-showing the viewer exactly as it will look online. Close the black window when
-you are finished.
+showing the front page exactly as it will look online; the second image is at
+`http://127.0.0.1:8000/grid2/`. Close the black window when you are finished.
 
-(Opening `index.html` directly by double-clicking it may also work, but some
-browsers restrict pages opened straight from disk, so `preview.bat` is the
-reliable way.)
+(Opening an `index.html` directly by double-clicking it may also work, but
+some browsers restrict pages opened straight from disk, so `preview.bat` is
+the reliable way.)
 
 ---
 
-## 4. Put it on GitHub Pages
+## 4. Publish to GitHub Pages
 
-You only do this once. It needs a free GitHub account and the free
-**GitHub Desktop** app (there are about 1,750 files, far too many to upload
-through the GitHub website, which takes 100 at a time).
+The site already lives in the GitHub repository **haydaddy/Breadclips**, with
+GitHub Pages switched on. Publishing a change is:
 
-### Step by step
+1. Open **GitHub Desktop**. The changed files are listed on the left.
+2. Type a short note in the **Summary** box (for example `add grid2`).
+3. Click **Commit to main**, then **Push origin**.
+4. Wait a minute or two. In the repository on github.com, the **Actions** tab
+   shows a green tick when "pages build and deployment" has finished.
 
-1. **Make an account** at <https://github.com> if you do not have one.
-   Your username becomes part of the address, so pick one you are happy with.
-2. **Install GitHub Desktop** from <https://desktop.github.com> and sign in.
-3. In GitHub Desktop choose **File → Add local repository…**, pick this folder
-   and click **Add repository**. It will say the folder is not a repository
-   yet - click the blue **create a repository** link, leave every field as it
-   is, and click **Create repository**.
-4. Click **Publish repository** (top right).
-   - **Name**: this becomes the end of the web address. `breadclips` is a good
-     choice.
-   - **Untick "Keep this code private"**. On a free account GitHub Pages only
-     works for public repositories.
-   - Click **Publish repository** and let the upload finish (about 90 MB).
-5. On <https://github.com>, open the new repository, then
-   **Settings → Pages** (left-hand menu).
-   - **Source**: *Deploy from a branch*
-   - **Branch**: `main`, folder `/ (root)` → **Save**
-6. Wait a minute or two and refresh that page. It shows the address of your
-   site:
+### Setting it up again from scratch
 
-   ```
-   https://YOUR-USERNAME.github.io/breadclips/
-   ```
+Only needed if you ever start a new repository (see section 10).
 
-   Open it. That is the viewer, live.
-
-### If you prefer the command line
-
-Install Git from <https://git-scm.com>, create an empty **public** repository
-called `breadclips` on github.com, then run these in this folder:
-
-```
-git init -b main
-git add .
-git commit -m "Bread clip viewer"
-git remote add origin https://github.com/YOUR-USERNAME/breadclips.git
-git push -u origin main
-```
-
-Then do step 5 above.
+1. In GitHub Desktop: **File → Add local repository…**, pick this folder. If
+   it says the folder is not a repository, click **create a repository** and
+   then **Create repository**.
+2. Click **Publish repository**. Name it `Breadclips` (the name is part of the
+   web address) and **untick "Keep this code private"** - on a free account
+   GitHub Pages only works for public repositories.
+3. On github.com: the repository → **Settings → Pages** → Source
+   *Deploy from a branch*, Branch `main`, folder `/ (root)` → **Save**.
 
 ---
 
 ## 5. Embed it in Wikidot
 
-Edit the page on `diversityofbreadclips.wikidot.com` and paste this line where
-the viewer should appear (replace `YOUR-USERNAME`, and `breadclips` if you
-named the repository differently):
+Put each viewer on its own Wikidot page with one of these lines:
 
 ```
-[[iframe https://YOUR-USERNAME.github.io/breadclips/ width="100%" height="800" frameborder="0" scrolling="no"]]
+[[iframe https://haydaddy.github.io/Breadclips/ width="100%" height="800" frameborder="0" scrolling="no" style="width:100%; height:85vh; border:0;"]]
 ```
+
+```
+[[iframe https://haydaddy.github.io/Breadclips/grid2/ width="100%" height="800" frameborder="0" scrolling="no" style="width:100%; height:85vh; border:0;"]]
+```
+
+To create a new Wikidot page, type its address in the browser, for example
+`diversityofbreadclips.wikidot.com/collection-2`, and click *create page*.
 
 What each part does:
 
 | Part | Meaning |
 | --- | --- |
-| `https://…github.io/breadclips/` | the address of the viewer |
+| `https://…/Breadclips/grid2/` | the address of the viewer (keep the `/` at the end) |
 | `width="100%"` | as wide as the page column |
-| `height="800"` | 800 pixels tall - change to taste |
+| `height="800"` | 800 pixels tall - used only if the `style` is ever ignored |
 | `frameborder="0"` | no border line around it |
 | `scrolling="no"` | no second scrollbar; the viewer does its own scrolling |
+| `style="… height:85vh …"` | 85 % of the height of the visitor's window |
 
-**A version that follows the size of the visitor's window.** Wikidot also
-allows a `style`, which can use `vh` (percent of the window height). This one
-is 85 % of the window tall, and falls back to 800 pixels if the style is ever
-ignored:
+### Making the viewer fill the whole Wikidot page
+
+Wikidot puts a header, a side menu and a page title around every page, so the
+viewer only gets the middle column. To give it the whole window, add this
+above the `[[iframe …]]` line on that page:
 
 ```
-[[iframe https://YOUR-USERNAME.github.io/breadclips/ width="100%" height="800" frameborder="0" scrolling="no" style="width:100%; height:85vh; border:0;"]]
+[[module CSS]]
+#header, #side-bar, #page-title { display: none; }
+#main-content { margin: 0; padding: 0; }
+#page-content p { margin: 0; }
+#page-content iframe { display: block; width: 100%; height: 100vh !important; }
+[[/module]]
 ```
+
+It only affects the page it is on. The Edit / History buttons and the footer
+are still there, just below the viewer - reach them with the browser's
+scrollbar on the right.
 
 Good to know:
 
@@ -179,49 +201,82 @@ Good to know:
 
 ---
 
-## 6. Updating the image
+## 6. Updating an image
 
-When you have a new `grid.png` (more clips, a new layout, anything):
+When you have a new version of `grid.png` or `grid2.png`:
 
-1. **Put the new `grid.png` in this folder**, replacing the old one.
-   (Or leave it where it is and drag it onto `make_tiles.bat` in the next step.)
-2. **Double-click `make_tiles.bat`.** It takes a few seconds and ends with
-   something like:
+1. **Put the new file in this folder**, replacing the old one (same name).
+2. **Double-click `make_tiles.bat`.** It rebuilds only the images that changed
+   since the last run and skips the rest:
 
    ```
-   wrote  : 1747 tiles, 85.7 MB in tiles/  (largest tile 167 kB)
-   version: 20261012-212418
+   == grid.png -> front page: unchanged since the last build, skipped
+
+   == grid2.png -> grid2/
+   ...
+   wrote  : 575 tiles, 15.0 MB in grid2\tiles/  (largest tile 127 kB)
    ```
 
    The first time ever, it installs pyvips by itself.
 3. **Check it** with `preview.bat`.
-4. **Publish it**: open GitHub Desktop. It lists the changed tiles on the left.
-   Type a short note in the **Summary** box (for example `new scans, October`),
-   click **Commit to main**, then **Push origin**.
-5. After a minute or two the website and the Wikidot page show the new image.
+4. **Publish it** as in [section 4](#4-publish-to-github-pages).
+5. After a minute or two the website and the Wikidot pages show the new image.
    Nothing on Wikidot needs to change.
 
 Things the script takes care of:
 
 - **The image can change size.** More rows, a different width - the viewer
-  reads the size from `tiles/manifest.js`, which is rewritten every time.
+  reads the size from `manifest.js`, which is rewritten every time.
 - **No stale tiles.** Every build gets a new version stamp that is added to
   each tile's address, so a visitor's browser can never mix old and new tiles.
 - **Safe to interrupt.** The new tiles are built in a temporary `tiles.new`
   folder and only swapped in when complete. If something fails, the existing
-  `tiles/` is untouched.
+  tiles are untouched.
 
-From a command prompt the same thing is:
+From a command prompt:
 
 ```
-python make_tiles.py                              (uses grid.png in this folder)
-python make_tiles.py ..\claude\output\grid.png    (any other file)
-python make_tiles.py --quality 95                 (see section 8)
+python make_tiles.py                         (every image that changed)
+python make_tiles.py grid2.png               (just this one, changed or not)
+python make_tiles.py D:\imageforclaude\grid2.png   (a copy kept somewhere else; matched by its name)
+python make_tiles.py --all                   (everything)
+python make_tiles.py --all --quality 95      (see section 9)
 ```
+
+You can also drag a `grid….png` from anywhere onto `make_tiles.bat`.
 
 ---
 
-## 7. Controls
+## 7. Adding another image
+
+Say you have `grid3.png`:
+
+1. Put `grid3.png` in this folder.
+2. Open `make_tiles.py` in Notepad. Near the top is the list of images; add a
+   line for the new one:
+
+   ```python
+   VIEWERS = {
+       "grid.png":  ("",      "Bread clip collection"),
+       "grid2.png": ("grid2", "Bread clip collection 2"),
+       "grid3.png": ("grid3", "Bread clip collection 3"),
+   }
+   ```
+
+   The middle part is the folder, which becomes the end of the web address
+   (`…/Breadclips/grid3/`); use lower-case letters, digits and `-` only. The
+   last part is the page title shown on the browser tab.
+3. Double-click `make_tiles.bat`. It cuts the tiles **and** creates
+   `grid3/index.html`.
+4. Check with `preview.bat` (`http://127.0.0.1:8000/grid3/`), publish as in
+   section 4, and embed `https://haydaddy.github.io/Breadclips/grid3/` in
+   Wikidot as in section 5.
+
+To change a page's title later, edit the `<title>` line in its `index.html`.
+
+---
+
+## 8. Controls
 
 | To do this | Mouse / keyboard | Trackpad | Touch screen |
 | --- | --- | --- | --- |
@@ -230,35 +285,47 @@ python make_tiles.py --quality 95                 (see section 8)
 | Move sideways when zoomed in | drag, Shift + wheel, `←` `→` | two-finger scroll | drag |
 | Jump a screen | `Page Down` / `Page Up`, `Space` / `Shift+Space` | | |
 | Jump to the start / end | `Home` / `End` | | |
-| Jump anywhere | click or drag in the strip on the right | same | tap the strip |
+| Jump anywhere | click or drag in the navigator | same | tap the navigator |
 | Back to fit-to-width | `0`, or the ↔ button | | ↔ button |
 
-The page always opens fitted to the width of the window, at the top. The strip
-on the right is the **navigator**: a miniature of the whole collection with a
-yellow box marking the part currently on screen.
+Every page opens fitted to the width of the window, at the top. The
+**navigator** is a miniature of the whole image with a yellow box marking the
+part currently on screen. It depends on the shape of the image:
+
+- **Long strips** like `grid.png` - the navigator is the strip down the right
+  edge, always visible, and zooming out stops at fit-to-width (any further and
+  the clips would be specks).
+- **Other images** like `grid2.png` - the navigator is a small picture in the
+  bottom-right corner that appears while you move around (or move the mouse)
+  and fades away after a moment so it does not cover any clips. You can zoom
+  out until the whole image fits on screen.
+
+The switch-over point is `LONG_IMAGE` in section 9.
 
 ---
 
-## 8. Settings you can change
+## 9. Settings you can change
 
 ### Tile settings - top of `make_tiles.py`
 
 | Setting | Default | What it does |
 | --- | --- | --- |
+| `VIEWERS` | two images | which master images become which pages (section 7) |
 | `QUALITY` | `92` | JPEG quality. Higher = larger files, see the table below |
 | `FORMAT` | `"jpg"` | `jpg`, `webp` or `png` |
 | `TILE_SIZE` | `512` | tile size in pixels. Smaller means many more files |
-| `SOURCE` | `"grid.png"` | the master image used when you do not name one |
-| `BACKGROUND` | `(0, 0, 0)` | colour that replaces transparency, if the master has any |
+| `BACKGROUND` | `(0, 0, 0)` | colour that replaces transparency, if a master has any |
 
-Sizes measured on the current image:
+These apply to every image. After changing one, run `make_tiles.py --all`.
+
+Sizes measured on `grid.png`:
 
 | Setting | Total size | Notes |
 | --- | --- | --- |
 | jpg, quality 85 | 63 MB | smallest jpg option |
 | jpg, quality 90 | 78 MB | |
 | **jpg, quality 92** | **86 MB** | **default** |
-| jpg, quality 95 | 112 MB | costs more per update (section 9) |
+| jpg, quality 95 | 112 MB | costs more per update (section 10) |
 | webp, quality 92 | 45 MB | half the size; takes about 25 s to build instead of 5 |
 | png | not measured, expect 300 MB or more | truly lossless, but slow to load - not recommended |
 
@@ -268,51 +335,56 @@ scale - well below what an eye can see. The tiles are also saved with full
 colour detail (no "chroma subsampling"), which keeps the edges of coloured
 clips crisp against the black background.
 
-### Viewer settings - the `Settings` block near the top of the script in `index.html`
+### Viewer settings - the `Settings` block at the top of `viewer/viewer.js`
+
+These apply to every page.
 
 | Setting | Default | What it does |
 | --- | --- | --- |
 | `MAX_ZOOM` | `2` | how far in you can zoom. `2` = each scan pixel shown twice as large |
-| `MIN_ZOOM` | `1` | how far out. `1` = fit to width; `0.5` would allow half that size |
 | `WHEEL_SMOOTHING` | `90` | how softly a mouse-wheel step glides. `0` = instant, `150` = floaty |
 | `ZOOM_STEP` | `1.5` | how much one press of `+` / `-` zooms |
 | `ARROW_STEP` | `120` | pixels moved per arrow-key press |
 | `PRELOAD_SCREENS` | `1` | how many screens ahead are downloaded early while scrolling. `0` = off |
+| `LONG_IMAGE` | `3` | images at least this many times taller than wide count as long strips (section 8) |
 
-The page title is the `<title>` line at the top of `index.html`. Colours and
-the width of the right-hand strip are in the `:root { … }` block just below it.
+Colours and the width of the right-hand strip are in the `:root { … }` block
+at the top of `viewer/viewer.css`.
 
 ---
 
-## 9. Limits worth knowing
+## 10. Limits worth knowing
 
 | GitHub limit | Value | Where this project stands |
 | --- | --- | --- |
 | Largest single file | 100 MB | biggest tile is under 0.2 MB. `grid.png` is over, which is why it is not uploaded |
-| Published site size | 1 GB | about 86 MB |
-| Traffic | 100 GB per month (soft) | scrolling through the whole collection at fit-to-width downloads about 20 MB in a normal window, about 53 MB on very large or high-density screens |
+| Published site size | 1 GB | about 101 MB (86 + 15) |
+| Traffic | 100 GB per month (soft) | scrolling through all of `grid.png` at fit-to-width downloads about 20 MB in a normal window, about 53 MB on very large or high-density screens |
 | Repository size | keep under about 1 GB | **grows with every update - read on** |
 
 **The repository remembers every version.** Git keeps the old tiles each time
-you publish new ones, so every update adds roughly the full tile size (about
-86 MB) to the repository, even though the website itself stays at 86 MB.
-After about ten updates it is worth starting fresh:
+you publish new ones, so updating an image adds roughly the size of its tiles
+to the repository (about 86 MB for `grid.png`, 15 MB for `grid2.png`), even
+though the website itself stays the same size. Images that did not change cost
+nothing: `make_tiles.bat` skips them, and even a forced rebuild produces
+identical files that Git does not store twice. After the repository passes
+about 1 GB it is worth starting fresh:
 
 1. On github.com: repository → **Settings** → scroll to the bottom →
    **Delete this repository**.
 2. In this folder, delete the hidden `.git` folder (turn on *View → Hidden
    items* in File Explorer to see it).
-3. Repeat [section 4](#4-put-it-on-github-pages) using the **same name**. The
-   address stays the same, so the Wikidot page keeps working.
+3. Follow *Setting it up again from scratch* in section 4 using the **same
+   name**. The addresses stay the same, so the Wikidot pages keep working.
 
-Using `webp` tiles (section 8) halves how fast it grows.
+Using `webp` tiles (section 9) halves how fast it grows.
 
 ---
 
-## 10. Troubleshooting
+## 11. Troubleshooting
 
 **The page says "No tiles found".**
-The `tiles/` folder is missing. Run `make_tiles.bat`.
+The `tiles/` folder next to that page is missing. Run `make_tiles.bat`.
 
 **The website still shows the old image after an update.**
 Give GitHub two or three minutes, then reload. In the repository on github.com
@@ -320,9 +392,18 @@ the **Actions** tab shows whether the "pages build and deployment" has
 finished (green tick). Also check that you clicked **Push origin** in GitHub
 Desktop, not only **Commit**.
 
-**The GitHub address shows a 404 page.**
-Pages is not switched on yet, or still building - see step 5 of section 4. The
-repository must be public.
+**An address shows a GitHub 404 page.**
+Check the spelling: the folder part is case-sensitive (`/Breadclips/grid2/`,
+not `/Breadclips/Grid2/`). For a new image, check that its folder was
+committed and pushed.
+
+**`make_tiles.bat` says an image "is not in the VIEWERS list".**
+The file name does not match a line in `VIEWERS` at the top of
+`make_tiles.py` - see section 7.
+
+**`make_tiles.bat` says an image is unchanged but you replaced it.**
+It compares file size and date. Run `python make_tiles.py grid2.png` (or drag
+the file onto `make_tiles.bat`) to force that image.
 
 **The Wikidot frame is empty.**
 Open the `github.io` address by itself first. If that works, compare the
@@ -338,9 +419,9 @@ Run `python -m pip install --upgrade pip` in a command prompt and try again.
 The line it runs is `python -m pip install -r requirements.txt`.
 
 **GitHub Desktop refuses to push because a file is too large.**
-A big image got included. Only `grid.png` and `grid_labeled.png` are left out
-automatically; add any other large file's name to `.gitignore`, or keep it
-outside this folder.
+A big image got included. Master images named `grid….png` in this folder are
+left out automatically; add any other large file's name to `.gitignore`, or
+keep it outside this folder.
 
 **Scrolling zooms instead (or the other way round).**
 Plain wheel = scroll, **Ctrl + wheel** = zoom. A pinch on a trackpad zooms.

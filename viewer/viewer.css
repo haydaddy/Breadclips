@@ -1,0 +1,121 @@
+/* Shared look of every viewer page. The page itself only says which tiles to show. */
+:root {
+  --rail: 48px;          /* width of the strip on the right (buttons, and the navigator for long images) */
+  --button: 36px;
+  --accent: #ffb300;
+  color-scheme: dark;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #000;
+  color: #ddd;
+  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  touch-action: none;    /* the viewer handles every gesture itself */
+}
+
+/* The image area. It stops short of the rail so the rail never covers a clip. */
+#viewer {
+  position: absolute;
+  inset: 0 var(--rail) 0 0;
+  background: #000;
+}
+
+#rail {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: var(--rail);
+  box-sizing: border-box;
+  padding: 6px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: #000;
+  border-left: 1px solid #222;
+}
+
+/* OpenSeadragon wraps #navigator in a div of its own, so the slot does the
+   layout and whatever ends up inside it is stretched to fill it. */
+#navigator-slot { position: relative; }
+#navigator-slot > div { position: absolute !important; inset: 0; }
+#navigator {
+  display: block !important;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+#navigator .displayregion {
+  background: rgba(255, 179, 0, .25) !important;
+  box-sizing: content-box;
+  min-height: 3px;
+}
+
+/* Long images: the navigator is a strip filling the rest of the rail. */
+.nav-strip #navigator-slot {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: var(--button);
+}
+
+/* Other images: a miniature in the bottom-right corner that fades out while
+   nothing is happening, so it does not sit on top of the clips. */
+.nav-box #navigator-slot {
+  position: absolute;
+  right: calc(var(--rail) + 12px);
+  bottom: 12px;
+  background: #000;
+  outline: 1px solid #444;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, .6);
+  opacity: 0;
+  transition: opacity .5s;
+}
+.nav-box #navigator-slot.show { opacity: 1; transition-duration: .15s; }
+/* while faded out it must not catch clicks meant for the image under it */
+.nav-box #navigator-slot:not(.show),
+.nav-box #navigator-slot:not(.show) * { pointer-events: none !important; }
+
+#rail button, #rail a {
+  flex: 0 0 auto;
+  width: var(--button);
+  height: var(--button);
+  box-sizing: border-box;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  color: #ddd;
+  background: #1b1b1b;
+  border: 1px solid #333;
+  border-radius: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#rail button:hover, #rail a:hover { background: #2a2a2a; color: #fff; }
+#rail button:active, #rail a:active { background: #383838; }
+#rail button:focus-visible, #rail a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+#rail svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+[hidden] { display: none !important; }
+
+#message, #hint {
+  position: absolute;
+  left: calc((100% - var(--rail)) / 2);
+  transform: translateX(-50%);
+  max-width: calc(100% - var(--rail) - 32px);
+  box-sizing: border-box;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(20, 20, 20, .85);
+  border: 1px solid #333;
+  text-align: center;
+  pointer-events: none;
+}
+#message { top: 40%; }
+#message.error { border-radius: 10px; color: #ffb4a8; pointer-events: auto; }
+#hint { bottom: 16px; opacity: 0; transition: opacity .6s; }
+#hint.show { opacity: 1; }
+
+@media (max-width: 520px) {
+  :root { --rail: 40px; --button: 32px; }
+  #hint { font-size: 12px; }
+}
