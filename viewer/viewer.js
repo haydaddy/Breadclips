@@ -16,10 +16,10 @@
   const ZOOM_STEP = 1.5;       // zoom factor of the + / - buttons and keys
   const ARROW_STEP = 120;      // pixels moved per arrow-key press
   const PRELOAD_SCREENS = 1;   // how many screens ahead of the scroll direction are fetched early
-  const LONG_IMAGE = 3;        // images at least this many times taller than wide get the
-                               // navigator as a strip in the rail, and cannot be zoomed out
-                               // past fit-to-width; others get a corner miniature and can
-                               // be zoomed out until the whole image fits
+  const LONG_IMAGE = 3;        // images at least this many times taller than wide get a
+                               // navigator strip in the rail, and cannot be zoomed out past
+                               // fit-to-width; others have no navigator (zooming out until
+                               // the whole image fits does that job without covering clips)
 
   const M = window.TILE_MANIFEST;
   const $ = (id) => document.getElementById(id);
@@ -43,7 +43,6 @@
       '<a id="open-tab" target="_blank" rel="noopener" title="Open in a new tab" aria-label="Open in a new tab" hidden>' +
         '<svg viewBox="0 0 24 24">' + ICONS['open-tab'] + '</svg></a>' +
     '</div>' +
-    '<div id="navigator-slot"><div id="navigator" title="Click or drag to jump"></div></div>' +
     '<div id="message">Loading…</div>' +
     '<div id="hint"></div>');
 
@@ -68,10 +67,11 @@
   const TILES_URL = 'tiles/' + M.name + '_files/';
   const QUERY = '?v=' + M.version;           // new version = new URLs = no stale cached tiles
 
-  // Long images: navigator strip in the rail. Others: miniature in the corner.
-  const navSlot = $('navigator-slot');
-  document.body.classList.add(IS_LONG ? 'nav-strip' : 'nav-box');
-  if (IS_LONG) { $('rail').appendChild(navSlot); }
+  // Long images: navigator strip filling the rest of the rail.
+  if (IS_LONG) {
+    $('rail').insertAdjacentHTML('beforeend',
+      '<div id="navigator-slot"><div id="navigator" title="Click or drag to jump"></div></div>');
+  }
 
   let embedded = false;
   try { embedded = window.self !== window.top; } catch (e) { embedded = true; }
@@ -98,8 +98,8 @@
     showNavigationControl: false,
     keyboardNavEnabled: false,
 
-    showNavigator: true,
-    navigatorId: 'navigator',
+    showNavigator: IS_LONG,
+    navigatorId: IS_LONG ? 'navigator' : null,
     navigatorBackground: '#000',
     navigatorDisplayRegionColor: '#ffb300',
 
@@ -131,7 +131,6 @@
     fitWidth(true, 0);         // start fitted to width, at the very top
     rememberView();
     showHint();
-    showNavigatorBox(3000);
     setTimeout(function () { preload(1); }, 400);
   });
   viewer.addHandler('open-failed', function () {
@@ -163,45 +162,11 @@
     rememberView();
   });
 
-  // The navigator is sized by CSS (strip) or below (corner box); tell
-  // OpenSeadragon whenever its size changes.
-  new ResizeObserver(function () {
-    if (viewer.navigator) { viewer.navigator.updateSize(); }
-  }).observe(navSlot);
-
-  // --------------------------------------------------------------------------
-  // Corner navigator (images that are not long strips)
-  // --------------------------------------------------------------------------
-  let navTimer = 0;
-
-  function sizeNavigatorBox() {
-    if (IS_LONG) { return; }
-    const area = $('viewer').getBoundingClientRect();
-    let width = Math.min(180, area.width * 0.3);
-    let height = width * IMAGE_HEIGHT;
-    if (height > area.height * 0.45) { height = area.height * 0.45; width = height / IMAGE_HEIGHT; }
-    navSlot.style.width = Math.round(width) + 'px';
-    navSlot.style.height = Math.round(height) + 'px';
-  }
-
-  // Visible while something happens (and while the mouse is over it), then fades.
-  function showNavigatorBox(ms) {
-    if (IS_LONG) { return; }
-    navSlot.classList.add('show');
-    clearTimeout(navTimer);
-    navTimer = setTimeout(function () {
-      if (!navSlot.matches(':hover')) { navSlot.classList.remove('show'); }
-      else { showNavigatorBox(1000); }
-    }, ms || 1500);
-  }
-
-  if (!IS_LONG) {
-    sizeNavigatorBox();
-    window.addEventListener('resize', sizeNavigatorBox);
-    viewer.addHandler('viewport-change', function () { if (vp) { showNavigatorBox(); } });
-    window.addEventListener('pointermove', function (e) {
-      if (e.pointerType === 'mouse') { showNavigatorBox(); }
-    });
+  // The navigator strip is sized by CSS; tell OpenSeadragon whenever that changes.
+  if (IS_LONG) {
+    new ResizeObserver(function () {
+      if (viewer.navigator) { viewer.navigator.updateSize(); }
+    }).observe($('navigator-slot'));
   }
 
   // --------------------------------------------------------------------------

@@ -36,9 +36,15 @@ html, body {
   border-left: 1px solid #222;
 }
 
-/* OpenSeadragon wraps #navigator in a div of its own, so the slot does the
-   layout and whatever ends up inside it is stretched to fill it. */
-#navigator-slot { position: relative; }
+/* Navigator strip, long images only. OpenSeadragon wraps #navigator in a div of
+   its own, so the slot does the layout and whatever ends up inside it is
+   stretched to fill it. */
+#navigator-slot {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: var(--button);
+  position: relative;
+}
 #navigator-slot > div { position: absolute !important; inset: 0; }
 #navigator {
   display: block !important;
@@ -51,30 +57,6 @@ html, body {
   box-sizing: content-box;
   min-height: 3px;
 }
-
-/* Long images: the navigator is a strip filling the rest of the rail. */
-.nav-strip #navigator-slot {
-  flex: 1 1 auto;
-  min-height: 0;
-  width: var(--button);
-}
-
-/* Other images: a miniature in the bottom-right corner that fades out while
-   nothing is happening, so it does not sit on top of the clips. */
-.nav-box #navigator-slot {
-  position: absolute;
-  right: calc(var(--rail) + 12px);
-  bottom: 12px;
-  background: #000;
-  outline: 1px solid #444;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, .6);
-  opacity: 0;
-  transition: opacity .5s;
-}
-.nav-box #navigator-slot.show { opacity: 1; transition-duration: .15s; }
-/* while faded out it must not catch clicks meant for the image under it */
-.nav-box #navigator-slot:not(.show),
-.nav-box #navigator-slot:not(.show) * { pointer-events: none !important; }
 
 #rail button, #rail a {
   flex: 0 0 auto;

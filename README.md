@@ -285,20 +285,19 @@ To change a page's title later, edit the `<title>` line in its `index.html`.
 | Move sideways when zoomed in | drag, Shift + wheel, `←` `→` | two-finger scroll | drag |
 | Jump a screen | `Page Down` / `Page Up`, `Space` / `Shift+Space` | | |
 | Jump to the start / end | `Home` / `End` | | |
-| Jump anywhere | click or drag in the navigator | same | tap the navigator |
+| Jump anywhere (long images) | click or drag in the navigator strip | same | tap the strip |
 | Back to fit-to-width | `0`, or the ↔ button | | ↔ button |
 
-Every page opens fitted to the width of the window, at the top. The
-**navigator** is a miniature of the whole image with a yellow box marking the
-part currently on screen. It depends on the shape of the image:
+Every page opens fitted to the width of the window, at the top. The rest
+depends on the shape of the image:
 
-- **Long strips** like `grid.png` - the navigator is the strip down the right
-  edge, always visible, and zooming out stops at fit-to-width (any further and
-  the clips would be specks).
-- **Other images** like `grid2.png` - the navigator is a small picture in the
-  bottom-right corner that appears while you move around (or move the mouse)
-  and fades away after a moment so it does not cover any clips. You can zoom
-  out until the whole image fits on screen.
+- **Long strips** like `grid.png` - the strip down the right edge is the
+  **navigator**: a miniature of the whole image with a yellow box marking the
+  part on screen. Zooming out stops at fit-to-width (any further and the clips
+  would be specks).
+- **Other images** like `grid2.png` - no navigator, so nothing covers the
+  clips. Instead you can zoom out until the whole image fits on screen, which
+  gives the same overview.
 
 The switch-over point is `LONG_IMAGE` in section 9.
 
