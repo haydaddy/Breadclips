@@ -60,7 +60,7 @@ PAGE = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23e8b030'/%3E%3Ccircle cx='8' cy='9' r='3' fill='%23000'/%3E%3Crect x='7' y='0' width='2' height='7' fill='%23000'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="{up}favicon.png">
 <link rel="stylesheet" href="{up}viewer/viewer.css">
 </head>
 <body>
